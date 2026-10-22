@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Photo Gallery</title>
+  <style>
+    /* CSS Reset & Variables */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-main: #0a0e17;
+      --bg-surface: #111827;
+      --bg-card: #162032;
+      --bg-card-hover: #1e2c45;
+      --border-subtle: #243247;
+      --border-focus: #38bdf8;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --badge-bg: #1e293b;
+      --badge-text: #cbd5e1;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.5);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header & Navigation */
+    header {
+      background-color: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f8fafc, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 240px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 1rem 0.55rem 2.25rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-focus);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b1120;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* Setup Banner */
+    .banner {
+      background: linear-gradient(90deg, #1e1b4b, #1e293b);
+      border: 1px solid #4338ca;
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.92rem;
+    }
+
+    .banner-text {
+      color: #c7d2fe;
+    }
+
+    .banner-code {
+      background: #0f172a;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #38bdf8;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* View Headers */
+    .view-header {
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .view-title-group h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .view-title-group p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .count-badge {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Folder Grid (Main View) */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .folder-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .folder-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
+    }
+
+    .folder-cover-container {
+      width: 100%;
+      height: 200px;
+      background: #0f172a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .folder-cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .folder-card:hover .folder-cover-img {
+      transform: scale(1.05);
+    }
+
+    .folder-cover-empty {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-faint);
+      gap: 0.5rem;
+    }
+
+    .folder-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .folder-name {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .folder-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Photo Grid (Folder View) */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .photo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      aspect-ratio: 1 / 1;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.02);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .photo-card:hover .photo-img {
+      transform: scale(1.05);
+    }
+
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 14, 23, 0.9) 0%, rgba(10, 14, 23, 0.3) 40%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1rem;
+    }
+
+    .photo-card:hover .photo-overlay {
+      opacity: 1;
+    }
+
+    .photo-overlay-caption {
+      font-size: 0.85rem;
+      color: #fff;
+      font-weight: 500;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+    }
+
+    .photo-overlay-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 11, 18, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .lightbox-counter {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .lightbox-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .lightbox-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .lightbox-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(1.05);
+    }
+
+    .lightbox-body {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .lightbox-img-wrapper {
+      max-width: 90%;
+      max-height: 82vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      user-select: none;
+    }
+
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .lightbox-nav-btn:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .lightbox-prev {
+      left: 1.5rem;
+    }
+
+    .lightbox-next {
+      right: 1.5rem;
+    }
+
+    .lightbox-footer {
+      padding: 1rem 1.5rem;
+      background: rgba(17, 24, 39, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .lightbox-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-width: 70%;
+    }
+
+    .lightbox-caption {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .lightbox-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    /* States & Feedback */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      margin-bottom: 1rem;
+      color: var(--text-faint);
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-actions {
+        width: 100%;
+      }
+      .search-box {
+        flex: 1;
+      }
+      .lightbox-prev {
+        left: 0.5rem;
+      }
+      .lightbox-next {
+        right: 0.5rem;
+      }
+      .lightbox-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .lightbox-details {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand" id="brandBtn">
+        <div class="brand-icon">
+          <!-- Camera / Gallery SVG icon -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </div>
+        <span class="brand-title">Family Album</span>
+      </div>
+
+      <div class="header-actions">
+        <div class="search-box">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search events or photos...">
+        </div>
+
+        <button id="refreshBtn" class="btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Worker URL Notice (Shown if placeholder is present) -->
+    <div id="setupBanner" class="banner" style="display: none;">
+      <div class="banner-text">
+        <strong>Setup Notice:</strong> Set <code class="banner-code">WORKER_URL</code> in <code class="banner-code">index.html</code> to your deployed Cloudflare Worker URL to fetch live photos from Telegram.
+      </div>
+    </div>
+
+    <!-- Main View: Event Folders -->
+    <section id="mainView">
+      <div class="view-header">
+        <div class="view-title-group">
+          <h2>
+            Event Folders
+            <span id="folderCountBadge" class="count-badge">0 Folders</span>
+          </h2>
+          <p>Organized by Telegram group topics &amp; family occasions</p>
+        </div>
+      </div>
+
+      <div id="folderContainer" class="folder-grid"></div>
+    </section>
+
+    <!-- Folder View: Photos Grid -->
+    <section id="folderView" style="display: none;">
+      <div class="view-header">
+        <div class="view-title-group">
+          <button id="backBtn" class="btn" style="margin-bottom: 0.75rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            ← Back to All Event Folders
+          </button>
+          <h2>
+            <span id="currentFolderTitle">Event</span>
+            <span id="photoCountBadge" class="count-badge">0 Photos</span>
+          </h2>
+        </div>
+      </div>
+
+      <div id="photoContainer" class="photo-grid"></div>
+    </section>
+
+    <!-- Empty / Loading States -->
+    <div id="loadingState" class="empty-state">
+      <div class="spinner"></div>
+      <p>Loading photos from Cloudflare D1...</p>
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+      </div>
+      <h3>No photos found</h3>
+      <p style="margin-top: 0.5rem;">Send photos or documents to your connected Telegram group to see them here.</p>
+    </div>
+  </main>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox">
+    <div class="lightbox-header">
+      <div id="lightboxCounter" class="lightbox-counter">1 / 1</div>
+      <div class="lightbox-actions">
+        <button id="lightboxClose" class="lightbox-btn" title="Close (Esc)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="lightbox-body">
+      <button id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" title="Previous photo (Left Arrow)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="lightbox-img-wrapper">
+        <img id="lightboxImg" class="lightbox-img" src="" alt="Full view">
+      </div>
+
+      <button id="lightboxNext" class="lightbox-nav-btn lightbox-next" title="Next photo (Right Arrow)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="lightbox-footer">
+      <div class="lightbox-details">
+        <div id="lightboxCaption" class="lightbox-caption"></div>
+        <div class="lightbox-meta">
+          <span id="lightboxSender">Uploaded by Anonymous</span>
+          <span>•</span>
+          <span id="lightboxDate">Oct 22, 2026</span>
+          <span>•</span>
+          <span id="lightboxTopic">General</span>
+        </div>
+      </div>
+
+      <a id="lightboxDownloadBtn" class="btn btn-primary" href="#" target="_blank" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span id="downloadBtnText">Download Original Full-Res</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Configuration: Replace with your deployed Cloudflare Worker URL
+    const WORKER_URL = "https://family-photo-api.hasan-album.workers.dev";
+
+    // State
+    let allPhotos = [];
+    let foldersMap = new Map(); // topic_name -> Array of photos
+    let currentFolderName = null;
+    let activeFolderPhotos = [];
+    let activePhotoIndex = 0;
+
+    // Elements
+    const mainView = document.getElementById('mainView');
+    const folderView = document.getElementById('folderView');
+    const folderContainer = document.getElementById('folderContainer');
+    const photoContainer = document.getElementById('photoContainer');
+    const folderCountBadge = document.getElementById('folderCountBadge');
+    const photoCountBadge = document.getElementById('photoCountBadge');
+    const currentFolderTitle = document.getElementById('currentFolderTitle');
+    const backBtn = document.getElementById('backBtn');
+    const brandBtn = document.getElementById('brandBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchInput = document.getElementById('searchInput');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const setupBanner = document.getElementById('setupBanner');
+
+    // Lightbox Elements
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxSender = document.getElementById('lightboxSender');
+    const lightboxDate = document.getElementById('lightboxDate');
+    const lightboxTopic = document.getElementById('lightboxTopic');
+    const lightboxDownloadBtn = document.getElementById('lightboxDownloadBtn');
+    const downloadBtnText = document.getElementById('downloadBtnText');
+
+    // Helper: Format bytes to KB / MB
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    // Helper: Format timestamp
+    function formatDate(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp > 1e11 ? timestamp : timestamp * 1000);
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    // Helper: Build Worker media file URL
+    function getFileUrl(fileId, dl = false, name = '') {
+      if (WORKER_URL === "REPLACE_WITH_WORKER_URL") {
+        return '';
+      }
+      let url = `${WORKER_URL.replace(/\/+$/, '')}/file/${fileId}`;
+      if (dl) {
+        url += `?dl=1&name=${encodeURIComponent(name || 'photo.jpg')}`;
+      }
+      return url;
+    }
+
+    // Fetch Photos from Backend API
+    async function loadPhotos() {
+      loadingState.style.display = 'block';
+      emptyState.style.display = 'none';
+
+      if (WORKER_URL === "REPLACE_WITH_WORKER_URL") {
+        setupBanner.style.display = 'flex';
+        loadingState.style.display = 'none';
+        renderDemoData();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${WORKER_URL.replace(/\/+$/, '')}/api/photos`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        allPhotos = await response.json();
+        groupPhotosIntoFolders();
+        renderMainView();
+      } catch (err) {
+        console.error('Failed to load photos:', err);
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    }
+
+    // Fallback demo data to preview UI before Worker URL is configured
+    function renderDemoData() {
+      allPhotos = [
+        {
+          id: 1,
+          topic_id: 1,
+          topic_name: 'Summer Vacation 2026',
+          thumb_file_id: 'demo_1',
+          full_file_id: 'demo_1',
+          file_name: 'beach_sunset.jpg',
+          file_size: 4200000,
+          caption: 'Sunset by the beach on our first day',
+          sender: 'Alex',
+          created_at: Date.now() - 86400000 * 2
+        },
+        {
+          id: 2,
+          topic_id: 1,
+          topic_name: 'Summer Vacation 2026',
+          thumb_file_id: 'demo_2',
+          full_file_id: 'demo_2',
+          file_name: 'family_dinner.jpg',
+          file_size: 3100000,
+          caption: 'Dinner together at the seaside restaurant',
+          sender: 'Sarah',
+          created_at: Date.now() - 86400000
+        },
+        {
+          id: 3,
+          topic_id: 2,
+          topic_name: 'Grandma Birthday Party',
+          thumb_file_id: 'demo_3',
+          full_file_id: 'demo_3',
+          file_name: 'birthday_cake.jpg',
+          file_size: 2800000,
+          caption: 'Blowing out the 80th birthday candles!',
+          sender: 'Michael',
+          created_at: Date.now() - 86400000 * 5
+        },
+        {
+          id: 4,
+          topic_id: 0,
+          topic_name: 'General',
+          thumb_file_id: 'demo_4',
+          full_file_id: 'demo_4',
+          file_name: 'backyard_bbq.jpg',
+          file_size: 1950000,
+          caption: 'Weekend afternoon barbecue in the garden',
+          sender: 'Mom',
+          created_at: Date.now() - 86400000 * 10
+        }
+      ];
+      groupPhotosIntoFolders();
+      renderMainView();
+    }
+
+    // Group photos into folders by topic_name
+    function groupPhotosIntoFolders() {
+      foldersMap.clear();
+      for (const p of allPhotos) {
+        const topic = p.topic_name || 'General';
+        if (!foldersMap.has(topic)) {
+          foldersMap.set(topic, []);
+        }
+        foldersMap.get(topic).push(p);
+      }
+    }
+
+    // Render Main View: Event Folders
+    function renderMainView() {
+      loadingState.style.display = 'none';
+      folderView.style.display = 'none';
+      mainView.style.display = 'block';
+
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      folderContainer.innerHTML = '';
+
+      const folders = Array.from(foldersMap.entries()).filter(([topicName, photos]) => {
+        if (!searchTerm) return true;
+        const matchesTopic = topicName.toLowerCase().includes(searchTerm);
+        const matchesPhotos = photos.some(p => (p.caption && p.caption.toLowerCase().includes(searchTerm)) || (p.sender && p.sender.toLowerCase().includes(searchTerm)));
+        return matchesTopic || matchesPhotos;
+      });
+
+      folderCountBadge.textContent = `${folders.length} ${folders.length === 1 ? 'Folder' : 'Folders'}`;
+
+      if (folders.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      folders.forEach(([topicName, photos]) => {
+        // Latest photo as folder cover
+        const latestPhoto = photos[0];
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+
+        const coverSrc = latestPhoto
+          ? (latestPhoto.thumb_file_id.startsWith('demo_')
+              ? `https://images.unsplash.com/photo-${latestPhoto.id === 1 ? '1507525428034-b723cf961d3e' : latestPhoto.id === 3 ? '1530103862676-de8c9debad1d' : '1555396273-367ea4eb4db5'}?auto=format&fit=crop&w=600&q=80`
+              : getFileUrl(latestPhoto.thumb_file_id))
+          : '';
+
+        card.innerHTML = `
+          <div class="folder-cover-container">
+            ${coverSrc
+              ? `<img class="folder-cover-img" src="${coverSrc}" alt="${escapeHtml(topicName)}" loading="lazy">`
+              : `<div class="folder-cover-empty">
+                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                   <span>No cover photo</span>
+                 </div>`
+            }
+          </div>
+          <div class="folder-info">
+            <div class="folder-name" title="${escapeHtml(topicName)}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: var(--accent); flex-shrink: 0;"><path d="M20 5h-8.586L9.707 3.293A1 1 0 0 0 9 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V7c0-1.103-.897-2-2-2z"></path></svg>
+              <span>${escapeHtml(topicName)}</span>
+            </div>
+            <div class="folder-meta">
+              <span>${photos.length} ${photos.length === 1 ? 'photo' : 'photos'}</span>
+              <span>${latestPhoto ? formatDate(latestPhoto.created_at) : ''}</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openFolder(topicName));
+        folderContainer.appendChild(card);
+      });
+    }
+
+    // Open a specific Folder View
+    function openFolder(topicName) {
+      currentFolderName = topicName;
+      activeFolderPhotos = foldersMap.get(topicName) || [];
+
+      mainView.style.display = 'none';
+      folderView.style.display = 'block';
+
+      currentFolderTitle.textContent = topicName;
+      renderPhotoGrid();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Photos in Folder
+    function renderPhotoGrid() {
+      photoContainer.innerHTML = '';
+      const searchTerm = searchInput.value.trim().toLowerCase();
+
+      const filteredPhotos = activeFolderPhotos.filter(p => {
+        if (!searchTerm) return true;
+        return (p.caption && p.caption.toLowerCase().includes(searchTerm)) ||
+               (p.sender && p.sender.toLowerCase().includes(searchTerm)) ||
+               (p.file_name && p.file_name.toLowerCase().includes(searchTerm));
+      });
+
+      photoCountBadge.textContent = `${filteredPhotos.length} ${filteredPhotos.length === 1 ? 'Photo' : 'Photos'}`;
+
+      if (filteredPhotos.length === 0) {
+        photoContainer.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <p>No photos match your filter in this event folder.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredPhotos.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+
+        const thumbSrc = p.thumb_file_id.startsWith('demo_')
+          ? `https://images.unsplash.com/photo-${p.id === 1 ? '1507525428034-b723cf961d3e' : p.id === 3 ? '1530103862676-de8c9debad1d' : '1555396273-367ea4eb4db5'}?auto=format&fit=crop&w=600&q=80`
+          : getFileUrl(p.thumb_file_id);
+
+        card.innerHTML = `
+          <img class="photo-img" src="${thumbSrc}" alt="${escapeHtml(p.caption || p.file_name)}" loading="lazy">
+          <div class="photo-overlay">
+            ${p.caption ? `<div class="photo-overlay-caption">${escapeHtml(p.caption)}</div>` : ''}
+            <div class="photo-overlay-meta">
+              <span>${escapeHtml(p.sender || 'Anonymous')}</span>
+              <span>${formatDate(p.created_at)}</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openLightbox(filteredPhotos, idx));
+        photoContainer.appendChild(card);
+      });
+    }
+
+    // Open Lightbox
+    function openLightbox(photoList, index) {
+      activeFolderPhotos = photoList;
+      activePhotoIndex = index;
+      updateLightboxContent();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function updateLightboxContent() {
+      const p = activeFolderPhotos[activePhotoIndex];
+      if (!p) return;
+
+      lightboxCounter.textContent = `${activePhotoIndex + 1} / ${activeFolderPhotos.length}`;
+
+      const fullSrc = p.full_file_id.startsWith('demo_')
+        ? `https://images.unsplash.com/photo-${p.id === 1 ? '1507525428034-b723cf961d3e' : p.id === 3 ? '1530103862676-de8c9debad1d' : '1555396273-367ea4eb4db5'}?auto=format&fit=crop&w=1600&q=85`
+        : getFileUrl(p.full_file_id);
+
+      lightboxImg.src = fullSrc;
+      lightboxCaption.textContent = p.caption || 'No caption';
+      lightboxSender.textContent = `Uploaded by ${p.sender || 'Anonymous'}`;
+      lightboxDate.textContent = formatDate(p.created_at);
+      lightboxTopic.textContent = p.topic_name || 'General';
+
+      // Download Button with exact specified link structure
+      const downloadUrl = p.full_file_id.startsWith('demo_')
+        ? fullSrc
+        : `${WORKER_URL.replace(/\/+$/, '')}/file/${p.full_file_id}?dl=1&name=${encodeURIComponent(p.file_name || 'photo.jpg')}`;
+
+      lightboxDownloadBtn.href = downloadUrl;
+      const sizeStr = p.file_size ? ` (${formatBytes(p.file_size)})` : '';
+      downloadBtnText.textContent = `Download Original Full-Res${sizeStr}`;
+
+      // Navigation button visibility
+      lightboxPrev.style.display = activePhotoIndex > 0 ? 'flex' : 'none';
+      lightboxNext.style.display = activePhotoIndex < activeFolderPhotos.length - 1 ? 'flex' : 'none';
+    }
+
+    function showPrevPhoto() {
+      if (activePhotoIndex > 0) {
+        activePhotoIndex--;
+        updateLightboxContent();
+      }
+    }
+
+    function showNextPhoto() {
+      if (activePhotoIndex < activeFolderPhotos.length - 1) {
+        activePhotoIndex++;
+        updateLightboxContent();
+      }
+    }
+
+    // HTML escape helper
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Event Listeners
+    backBtn.addEventListener('click', () => {
+      mainView.style.display = 'block';
+      folderView.style.display = 'none';
+      currentFolderName = null;
+      renderMainView();
+    });
+
+    brandBtn.addEventListener('click', () => {
+      mainView.style.display = 'block';
+      folderView.style.display = 'none';
+      currentFolderName = null;
+      renderMainView();
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      loadPhotos();
+    });
+
+    searchInput.addEventListener('input', () => {
+      if (folderView.style.display !== 'none') {
+        renderPhotoGrid();
+      } else {
+        renderMainView();
+      }
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', showPrevPhoto);
+    lightboxNext.addEventListener('click', showNextPhoto);
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showPrevPhoto();
+      if (e.key === 'ArrowRight') showNextPhoto();
+    });
+
+    // Close lightbox on clicking backdrop
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target.classList.contains('lightbox-body')) {
+        closeLightbox();
+      }
+    });
+
+    // Initial Load
+    loadPhotos();
+  </script>
+</body>
+</html>
+
