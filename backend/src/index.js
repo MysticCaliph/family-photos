@@ -6,7 +6,7 @@
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': '*',
 };
 
 function jsonResponse(data, status = 200) {
@@ -42,8 +42,22 @@ export default {
         return jsonResponse({ ok: true, service: 'family-photo-api', status: 'operational' });
       }
 
-      // 3. API: List all photos
+      // 3. API: Verify Passcode
+      if (request.method === 'GET' && pathname === '/api/verify') {
+        const providedCode = (searchParams.get('code') || request.headers.get('x-passcode') || '').trim();
+        if (!env.FAMILY_PASSCODE || providedCode === String(env.FAMILY_PASSCODE).trim()) {
+          return jsonResponse({ ok: true, verified: true });
+        }
+        return jsonResponse({ ok: false, error: 'Unauthorized: Invalid passcode' }, 401);
+      }
+
+      // 4. API: List all photos
       if (request.method === 'GET' && pathname === '/api/photos') {
+        const providedCode = (searchParams.get('code') || request.headers.get('x-passcode') || '').trim();
+        if (env.FAMILY_PASSCODE && providedCode !== String(env.FAMILY_PASSCODE).trim()) {
+          return jsonResponse({ ok: false, error: 'Unauthorized: Invalid passcode' }, 401);
+        }
+
         const query = await env.DB.prepare(
           'SELECT * FROM photos ORDER BY created_at DESC'
         ).all();
