@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS topics (
   topic_name TEXT NOT NULL
 );
 
--- Table for storing photo metadata
+-- Table for storing photo and video metadata
 CREATE TABLE IF NOT EXISTS photos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   file_unique_id TEXT UNIQUE,
@@ -16,10 +16,12 @@ CREATE TABLE IF NOT EXISTS photos (
   sender TEXT,
   topic_id INTEGER DEFAULT 0,
   topic_name TEXT DEFAULT 'General',
-  created_at INTEGER
+  created_at INTEGER,
+  media_type TEXT DEFAULT 'photo',
+  duration INTEGER DEFAULT 0,
+  message_id INTEGER DEFAULT 0
 );
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_photos_topic ON photos(topic_id);
 CREATE INDEX IF NOT EXISTS idx_photos_created ON photos(created_at DESC);
-
