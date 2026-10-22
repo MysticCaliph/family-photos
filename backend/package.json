@@ -1,0 +1,23 @@
+{
+  "name": "family-photo-api",
+  "version": "1.0.0",
+  "description": "Telegram Family Photo Gallery backend powered by Cloudflare Workers and D1",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "d1:init": "wrangler d1 execute family-db --file=./schema.sql"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "telegram-bot",
+    "d1",
+    "photo-gallery"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}
+

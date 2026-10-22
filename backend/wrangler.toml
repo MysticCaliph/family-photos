@@ -1,0 +1,15 @@
+name = "family-photo-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Cloudflare D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "family-db"
+database_id = "a4c5c1b6-7aaa-4e4a-9135-1e2f07fc99dc"
+
+# Environment variables (configured via `wrangler secret put <KEY>` or below)
+# [vars]
+# ALLOWED_CHAT_ID = "-100xxxxxxxxx"
+# BOT_TOKEN = "123456:ABC-DEF..."
+
