@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Photo Gallery</title>
+  <title>Family Photo & Video Gallery</title>
 
   <!-- Preconnect to Cloudflare Worker API for ultra-fast media loading -->
   <link rel="preconnect" href="https://family-photo-api.hasan-album.workers.dev" crossorigin>
@@ -28,7 +28,7 @@
       --bg-surface: #0e131f;
       --bg-card: #141b2a;
       --bg-card-hover: #1a2337;
-      --bg-glass: rgba(14, 19, 31, 0.78);
+      --bg-glass: rgba(14, 19, 31, 0.82);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-hover: rgba(56, 189, 248, 0.45);
       --border-focus: #38bdf8;
@@ -39,7 +39,7 @@
       --accent-hover: #0ea5e9;
       --accent-gradient: linear-gradient(135deg, #f97316 0%, #e11d48 50%, #8b5cf6 100%);
       --accent-glow: rgba(56, 189, 248, 0.25);
-      --badge-bg: rgba(255, 255, 255, 0.06);
+      --badge-bg: rgba(255, 255, 255, 0.08);
       --badge-text: #e2e8f0;
       --radius-sm: 10px;
       --radius-md: 14px;
@@ -62,7 +62,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Shimmer Animation for instant image skeleton */
+    /* Shimmer Skeleton Placeholder */
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
@@ -74,7 +74,7 @@
       animation: shimmer 1.8s infinite linear;
     }
 
-    /* Top Sticky Header */
+    /* Header */
     header {
       background: var(--bg-glass);
       backdrop-filter: blur(16px);
@@ -106,7 +106,6 @@
       text-decoration: none;
     }
 
-    /* Custom Mini Brand Logo Emblem */
     .brand-logo-emblem {
       width: 42px;
       height: 42px;
@@ -172,7 +171,7 @@
       pointer-events: none;
     }
 
-    /* Modern Buttons */
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -226,6 +225,20 @@
       transform: translateY(-2px);
     }
 
+    .btn-telegram {
+      background: linear-gradient(135deg, #229ED9, #0088cc);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0, 136, 204, 0.35);
+    }
+
+    .btn-telegram:hover {
+      background: linear-gradient(135deg, #1d8ec4, #0077b5);
+      box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
+      transform: translateY(-2px);
+    }
+
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -253,7 +266,6 @@
       padding: 2.5rem 2rem 4rem;
     }
 
-    /* View Header */
     .view-header {
       margin-bottom: 2.25rem;
       display: flex;
@@ -270,6 +282,7 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
+      flex-wrap: wrap;
     }
 
     .view-title-group p {
@@ -295,14 +308,14 @@
       flex-wrap: wrap;
     }
 
-    /* Spacious Folder Grid */
-    .folder-grid {
+    /* Grids */
+    .folder-grid, .photo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
       gap: 24px;
     }
 
-    .folder-card {
+    .folder-card, .photo-card {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
@@ -315,11 +328,23 @@
       position: relative;
     }
 
-    .folder-card:hover {
-      transform: translateY(-6px);
+    .photo-card {
+      aspect-ratio: 1 / 1;
+    }
+
+    .folder-card:hover, .photo-card:hover {
+      transform: translateY(-5px);
       border-color: var(--border-hover);
       box-shadow: var(--shadow-hover);
       background: var(--bg-card-hover);
+    }
+
+    .card-media-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #0d121d;
     }
 
     .folder-cover-wrapper {
@@ -327,9 +352,10 @@
       height: 230px;
       position: relative;
       overflow: hidden;
+      background: #0d121d;
     }
 
-    .folder-cover-img {
+    .card-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -338,19 +364,109 @@
       display: block;
     }
 
-    .folder-card:hover .folder-cover-img {
-      transform: scale(1.05);
+    .folder-card:hover .card-img, .photo-card:hover .card-img {
+      transform: scale(1.06);
     }
 
-    .folder-cover-empty {
-      width: 100%;
-      height: 100%;
+    /* Video Overlay & Play Button Badge */
+    .video-play-overlay {
+      position: absolute;
+      inset: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: var(--text-faint);
-      gap: 0.6rem;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .video-play-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(14, 19, 31, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .photo-card:hover .video-play-icon {
+      transform: scale(1.15);
+      background: rgba(225, 29, 72, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .video-badges {
+      position: absolute;
+      top: 0.85rem;
+      right: 0.85rem;
+      display: flex;
+      gap: 0.45rem;
+      z-index: 3;
+    }
+
+    .video-badge {
+      background: rgba(8, 11, 18, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .video-badge-pill {
+      background: #e11d48;
+      border-color: #f43f5e;
+    }
+
+    .video-badge-large {
+      background: #f59e0b;
+      color: #0b1120;
+      border-color: #fbbf24;
+    }
+
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(7, 9, 14, 0.94) 0%, rgba(7, 9, 14, 0.3) 45%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.25rem;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .photo-card:hover .photo-overlay {
+      opacity: 1;
+    }
+
+    .photo-overlay-caption {
+      font-size: 0.92rem;
+      color: #fff;
+      font-weight: 600;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+
+    .photo-overlay-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .folder-info {
@@ -379,87 +495,6 @@
       justify-content: space-between;
       color: var(--text-muted);
       font-size: 0.9rem;
-    }
-
-    /* Spacious Photo Grid */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 24px;
-    }
-
-    .photo-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      aspect-ratio: 1 / 1;
-      box-shadow: var(--shadow-card);
-    }
-
-    .photo-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      border-color: var(--border-hover);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .photo-img-wrapper {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .photo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.35s ease, transform 0.4s ease;
-      display: block;
-    }
-
-    .photo-card:hover .photo-img {
-      transform: scale(1.06);
-    }
-
-    .photo-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(7, 9, 14, 0.92) 0%, rgba(7, 9, 14, 0.3) 40%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 1.25rem;
-      pointer-events: none;
-    }
-
-    .photo-card:hover .photo-overlay {
-      opacity: 1;
-    }
-
-    .photo-overlay-caption {
-      font-size: 0.92rem;
-      color: #fff;
-      font-weight: 600;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 0.35rem;
-    }
-
-    .photo-overlay-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
     }
 
     /* PASSCODE LOCK SCREEN */
@@ -524,10 +559,6 @@
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-    }
-
-    .passcode-input-wrapper {
-      position: relative;
     }
 
     .passcode-input {
@@ -620,23 +651,51 @@
       overflow: hidden;
     }
 
-    .lightbox-img-wrapper {
+    .lightbox-media-wrapper {
       max-width: 90%;
-      max-height: 80vh;
+      max-height: 78vh;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
     }
 
-    .lightbox-img {
+    .lightbox-img, .lightbox-video {
       max-width: 100%;
-      max-height: 80vh;
+      max-height: 78vh;
       object-fit: contain;
       border-radius: var(--radius-sm);
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
       user-select: none;
-      transition: transform 0.25s ease;
+    }
+
+    .large-video-card {
+      background: rgba(18, 25, 41, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      max-width: 540px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .large-video-thumb-preview {
+      width: 100%;
+      height: 220px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .large-video-thumb-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .lightbox-nav-btn {
@@ -682,7 +741,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
-      max-width: 70%;
+      max-width: 60%;
     }
 
     .lightbox-caption {
@@ -697,6 +756,13 @@
       display: flex;
       gap: 0.85rem;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .lightbox-actions-panel {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
@@ -726,17 +792,23 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Responsive */
+    .folder-notice-banner {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+      padding: 0.75rem 1.2rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
     @media (max-width: 768px) {
-      .header-container {
-        padding: 1rem 1.25rem;
-      }
-      main {
-        padding: 1.75rem 1.25rem 3rem;
-      }
-      .search-box {
-        min-width: 100%;
-      }
+      .header-container { padding: 1rem 1.25rem; }
+      main { padding: 1.75rem 1.25rem 3rem; }
+      .search-box { min-width: 100%; }
       .lightbox-prev { left: 0.75rem; }
       .lightbox-next { right: 0.75rem; }
       .lightbox-details { max-width: 100%; }
@@ -753,7 +825,6 @@
   <div id="lockScreen" class="lock-screen-container" style="display: none;">
     <div class="lock-card">
       <div class="lock-emblem">
-        <!-- SVG Emblem -->
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -792,7 +863,6 @@
     <div class="header-container">
       <div class="brand" id="brandBtn">
         <div class="brand-logo-emblem">
-          <!-- Mini Camera Emblem SVG -->
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
@@ -807,10 +877,10 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search events, captions, senders...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search events, videos, photos...">
         </div>
 
-        <button id="refreshBtn" class="btn" title="Refresh Photos">
+        <button id="refreshBtn" class="btn" title="Refresh Photos & Videos">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
             <polyline points="1 20 1 14 7 14"></polyline>
@@ -847,7 +917,7 @@
       <div id="folderContainer" class="folder-grid"></div>
     </section>
 
-    <!-- Folder View: Photos Grid -->
+    <!-- Folder View: Photos & Videos Grid -->
     <section id="folderView" style="display: none;">
       <div class="view-header">
         <div class="view-title-group">
@@ -867,15 +937,25 @@
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              <span id="zipBtnText">⬇ Download All Photos (.zip)</span>
+              <span id="zipBtnText">⬇ Download All (.zip)</span>
             </button>
           </div>
 
           <h2>
             <span id="currentFolderTitle">Event</span>
-            <span id="photoCountBadge" class="count-badge">0 Photos</span>
+            <span id="photoCountBadge" class="count-badge">0 Media</span>
           </h2>
         </div>
+      </div>
+
+      <!-- Info notice if large videos exist in this folder -->
+      <div id="largeVideosNotice" class="folder-notice-banner" style="display: none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span id="largeVideosNoticeText">This folder includes large HD videos (>20 MB). You can watch and download them directly via Telegram.</span>
       </div>
 
       <div id="photoContainer" class="photo-grid"></div>
@@ -895,8 +975,8 @@
           <polyline points="21 15 16 10 5 21"></polyline>
         </svg>
       </div>
-      <h3 style="font-size: 1.3rem;">No photos found</h3>
-      <p style="margin-top: 0.5rem;">Send photos or documents to your connected Telegram group to see them here.</p>
+      <h3 style="font-size: 1.3rem;">No media found</h3>
+      <p style="margin-top: 0.5rem;">Send photos or videos to your connected Telegram group to see them here.</p>
     </div>
   </main>
 
@@ -915,17 +995,43 @@
     </div>
 
     <div class="lightbox-body">
-      <button id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" title="Previous photo (Left Arrow)">
+      <button id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" title="Previous item (Left Arrow)">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       </button>
 
-      <div class="lightbox-img-wrapper">
-        <img id="lightboxImg" class="lightbox-img" src="" alt="Full view">
+      <div class="lightbox-media-wrapper">
+        <!-- Photo display -->
+        <img id="lightboxImg" class="lightbox-img" src="" alt="Full view" style="display: none;">
+
+        <!-- Video player for videos <= 20 MB -->
+        <video id="lightboxVideo" class="lightbox-video" controls autoplay playsinline style="display: none;"></video>
+
+        <!-- Large video notice card for videos > 20 MB -->
+        <div id="lightboxLargeVideo" class="large-video-card" style="display: none;">
+          <div class="large-video-thumb-preview">
+            <img id="largeVideoThumbImg" src="" alt="Video thumbnail">
+            <div class="video-play-overlay">
+              <div class="video-play-icon" style="width: 60px; height: 60px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">High-Definition Telegram Video</h3>
+            <p id="largeVideoSizeText" style="color: var(--text-muted); font-size: 0.95rem;">File size exceeds 20 MB.</p>
+          </div>
+          <a id="largeVideoTelegramBtn" class="btn btn-telegram" href="#" target="_blank" style="padding: 0.75rem 1.4rem; font-size: 1rem;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
+            </svg>
+            <span>Open &amp; Watch in Telegram</span>
+          </a>
+        </div>
       </div>
 
-      <button id="lightboxNext" class="lightbox-nav-btn lightbox-next" title="Next photo (Right Arrow)">
+      <button id="lightboxNext" class="lightbox-nav-btn lightbox-next" title="Next item (Right Arrow)">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
@@ -941,28 +1047,41 @@
           <span id="lightboxDate">Oct 22, 2026</span>
           <span>•</span>
           <span id="lightboxTopic">General</span>
+          <span id="lightboxTypeBadge" class="count-badge" style="font-size: 0.75rem;">Photo</span>
         </div>
       </div>
 
-      <a id="lightboxDownloadBtn" class="btn btn-primary" href="#" target="_blank" download>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        <span id="downloadBtnText">Download Original Full-Res</span>
-      </a>
+      <div class="lightbox-actions-panel">
+        <!-- Direct Download Button -->
+        <a id="lightboxDownloadBtn" class="btn btn-primary" href="#" target="_blank" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="downloadBtnText">Download Original</span>
+        </a>
+
+        <!-- Telegram Deep Link Button -->
+        <a id="lightboxTgLinkBtn" class="btn btn-telegram" href="#" target="_blank" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
+          </svg>
+          <span>View in Telegram</span>
+        </a>
+      </div>
     </div>
   </div>
 
   <script>
     // Configuration: Deployed Cloudflare Worker API URL
     const WORKER_URL = "https://family-photo-api.hasan-album.workers.dev";
+    const MAX_WORKER_DOWNLOAD_BYTES = 20971520; // 20 MB Telegram Bot API limit
 
     // State
     let currentPasscode = localStorage.getItem('family_passcode') || '';
     let allPhotos = [];
-    let foldersMap = new Map(); // topic_name -> Array of photos
+    let foldersMap = new Map(); // topic_name -> Array of photos/videos
     let currentFolderName = null;
     let activeFolderPhotos = [];
     let activePhotoIndex = 0;
@@ -988,12 +1107,18 @@
     const searchInput = document.getElementById('searchInput');
     const downloadZipBtn = document.getElementById('downloadZipBtn');
     const zipBtnText = document.getElementById('zipBtnText');
+    const largeVideosNotice = document.getElementById('largeVideosNotice');
     const loadingState = document.getElementById('loadingState');
     const emptyState = document.getElementById('emptyState');
 
     // Lightbox Elements
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxVideo = document.getElementById('lightboxVideo');
+    const lightboxLargeVideo = document.getElementById('lightboxLargeVideo');
+    const largeVideoThumbImg = document.getElementById('largeVideoThumbImg');
+    const largeVideoSizeText = document.getElementById('largeVideoSizeText');
+    const largeVideoTelegramBtn = document.getElementById('largeVideoTelegramBtn');
     const lightboxClose = document.getElementById('lightboxClose');
     const lightboxPrev = document.getElementById('lightboxPrev');
     const lightboxNext = document.getElementById('lightboxNext');
@@ -1002,10 +1127,12 @@
     const lightboxSender = document.getElementById('lightboxSender');
     const lightboxDate = document.getElementById('lightboxDate');
     const lightboxTopic = document.getElementById('lightboxTopic');
+    const lightboxTypeBadge = document.getElementById('lightboxTypeBadge');
     const lightboxDownloadBtn = document.getElementById('lightboxDownloadBtn');
+    const lightboxTgLinkBtn = document.getElementById('lightboxTgLinkBtn');
     const downloadBtnText = document.getElementById('downloadBtnText');
 
-    // Format bytes helper
+    // Helper: format bytes
     function formatBytes(bytes) {
       if (!bytes || bytes === 0) return '0 B';
       const k = 1024;
@@ -1014,7 +1141,15 @@
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
 
-    // Format date helper
+    // Helper: format video duration mm:ss
+    function formatDuration(sec) {
+      if (!sec || sec <= 0) return '';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    // Helper: format date
     function formatDate(timestamp) {
       if (!timestamp) return '';
       const date = new Date(timestamp > 1e11 ? timestamp : timestamp * 1000);
@@ -1025,16 +1160,24 @@
       });
     }
 
+    // Helper: build Telegram deep link
+    function getTelegramMessageLink(item) {
+      if (!item.chat_link_id || !item.message_id) return '';
+      const topicPart = item.topic_id && item.topic_id !== 0 ? `${item.topic_id}/` : '';
+      return `https://t.me/c/${item.chat_link_id}/${topicPart}${item.message_id}`;
+    }
+
     // Build Worker file streaming URL
     function getFileUrl(fileId, dl = false, name = '') {
+      if (!fileId) return '';
       let url = `${WORKER_URL.replace(/\/+$/, '')}/file/${fileId}`;
       if (dl) {
-        url += `?dl=1&name=${encodeURIComponent(name || 'photo.jpg')}`;
+        url += `?dl=1&name=${encodeURIComponent(name || 'media')}`;
       }
       return url;
     }
 
-    // Passcode Lock / Unlock Logic
+    // Passcode Logic
     function checkPasscodeRequirement() {
       if (!currentPasscode) {
         showLockScreen();
@@ -1100,7 +1243,7 @@
       showLockScreen();
     }
 
-    // Fetch Photos from Backend API
+    // Load Photos & Videos
     async function loadPhotos() {
       loadingState.style.display = 'block';
       emptyState.style.display = 'none';
@@ -1110,7 +1253,6 @@
         const response = await fetch(queryUrl);
 
         if (response.status === 401) {
-          // Passcode invalid or expired
           logoutAndLock();
           return;
         }
@@ -1119,17 +1261,18 @@
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        allPhotos = await response.json();
+        const data = await response.json();
+        allPhotos = Array.isArray(data) ? data : (data.photos || []);
         groupPhotosIntoFolders();
         renderMainView();
       } catch (err) {
-        console.error('Failed to load photos:', err);
+        console.error('Failed to load media:', err);
         loadingState.style.display = 'none';
         emptyState.style.display = 'block';
       }
     }
 
-    // Group photos into folders by topic_name
+    // Group photos & videos into folders by topic_name
     function groupPhotosIntoFolders() {
       foldersMap.clear();
       for (const p of allPhotos) {
@@ -1150,11 +1293,15 @@
       const searchTerm = searchInput.value.trim().toLowerCase();
       folderContainer.innerHTML = '';
 
-      const folders = Array.from(foldersMap.entries()).filter(([topicName, photos]) => {
+      const folders = Array.from(foldersMap.entries()).filter(([topicName, items]) => {
         if (!searchTerm) return true;
         const matchesTopic = topicName.toLowerCase().includes(searchTerm);
-        const matchesPhotos = photos.some(p => (p.caption && p.caption.toLowerCase().includes(searchTerm)) || (p.sender && p.sender.toLowerCase().includes(searchTerm)));
-        return matchesTopic || matchesPhotos;
+        const matchesItems = items.some(p =>
+          (p.caption && p.caption.toLowerCase().includes(searchTerm)) ||
+          (p.sender && p.sender.toLowerCase().includes(searchTerm)) ||
+          (p.file_name && p.file_name.toLowerCase().includes(searchTerm))
+        );
+        return matchesTopic || matchesItems;
       });
 
       folderCountBadge.textContent = `${folders.length} ${folders.length === 1 ? 'Folder' : 'Folders'}`;
@@ -1165,20 +1312,24 @@
       }
       emptyState.style.display = 'none';
 
-      folders.forEach(([topicName, photos]) => {
-        const latestPhoto = photos[0];
+      folders.forEach(([topicName, items]) => {
+        // Find best cover (first photo or video with thumb)
+        const coverItem = items.find(i => i.thumb_file_id) || items[0];
+        const videoCount = items.filter(i => i.media_type === 'video').length;
+        const photoCount = items.length - videoCount;
+
         const card = document.createElement('div');
         card.className = 'folder-card';
 
-        const coverSrc = latestPhoto ? getFileUrl(latestPhoto.thumb_file_id) : '';
+        const coverSrc = coverItem && coverItem.thumb_file_id ? getFileUrl(coverItem.thumb_file_id) : '';
 
         card.innerHTML = `
           <div class="folder-cover-wrapper shimmer-skeleton">
             ${coverSrc
-              ? `<img class="folder-cover-img" src="${coverSrc}" alt="${escapeHtml(topicName)}" loading="lazy" decoding="async" onload="this.style.opacity='1'; this.parentElement.classList.remove('shimmer-skeleton');">`
+              ? `<img class="card-img" src="${coverSrc}" alt="${escapeHtml(topicName)}" loading="lazy" decoding="async" onload="this.style.opacity='1'; this.parentElement.classList.remove('shimmer-skeleton');">`
               : `<div class="folder-cover-empty">
                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                   <span>No cover photo</span>
+                   <span>No cover preview</span>
                  </div>`
             }
           </div>
@@ -1188,8 +1339,8 @@
               <span>${escapeHtml(topicName)}</span>
             </div>
             <div class="folder-meta">
-              <span>${photos.length} ${photos.length === 1 ? 'photo' : 'photos'}</span>
-              <span>${latestPhoto ? formatDate(latestPhoto.created_at) : ''}</span>
+              <span>${items.length} items ${videoCount > 0 ? `(${photoCount} photos, ${videoCount} videos)` : ''}</span>
+              <span>${coverItem ? formatDate(coverItem.created_at) : ''}</span>
             </div>
           </div>
         `;
@@ -1209,47 +1360,87 @@
 
       currentFolderTitle.textContent = topicName;
 
-      // Update Download All ZIP button with total size and count
-      const totalBytes = activeFolderPhotos.reduce((sum, p) => sum + (p.file_size || 0), 0);
-      zipBtnText.textContent = `⬇ Download All (${activeFolderPhotos.length} photos · ${formatBytes(totalBytes)})`;
-      downloadZipBtn.disabled = isZipping || activeFolderPhotos.length === 0;
+      // Check for large videos > 20MB in this folder
+      const largeVideos = activeFolderPhotos.filter(p => p.media_type === 'video' && (p.file_size || 0) > MAX_WORKER_DOWNLOAD_BYTES);
+      if (largeVideos.length > 0) {
+        largeVideosNotice.style.display = 'flex';
+      } else {
+        largeVideosNotice.style.display = 'none';
+      }
+
+      // Update Download All ZIP button with downloadable count and size
+      const downloadableItems = activeFolderPhotos.filter(p => (p.file_size || 0) <= MAX_WORKER_DOWNLOAD_BYTES);
+      const totalDownloadBytes = downloadableItems.reduce((sum, p) => sum + (p.file_size || 0), 0);
+      zipBtnText.textContent = `⬇ Download All ZIP (${downloadableItems.length} items · ${formatBytes(totalDownloadBytes)})`;
+      downloadZipBtn.disabled = isZipping || downloadableItems.length === 0;
 
       renderPhotoGrid();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Render Photos in Folder
+    // Render Items in Folder
     function renderPhotoGrid() {
       photoContainer.innerHTML = '';
       const searchTerm = searchInput.value.trim().toLowerCase();
 
-      const filteredPhotos = activeFolderPhotos.filter(p => {
+      const filteredItems = activeFolderPhotos.filter(p => {
         if (!searchTerm) return true;
         return (p.caption && p.caption.toLowerCase().includes(searchTerm)) ||
                (p.sender && p.sender.toLowerCase().includes(searchTerm)) ||
                (p.file_name && p.file_name.toLowerCase().includes(searchTerm));
       });
 
-      photoCountBadge.textContent = `${filteredPhotos.length} ${filteredPhotos.length === 1 ? 'Photo' : 'Photos'}`;
+      const videoCount = filteredItems.filter(i => i.media_type === 'video').length;
+      const photoCount = filteredItems.length - videoCount;
+      photoCountBadge.textContent = `${filteredItems.length} Items${videoCount > 0 ? ` (${photoCount} photos, ${videoCount} videos)` : ''}`;
 
-      if (filteredPhotos.length === 0) {
+      if (filteredItems.length === 0) {
         photoContainer.innerHTML = `
           <div class="empty-state" style="grid-column: 1 / -1;">
-            <p>No photos match your filter in this event folder.</p>
+            <p>No media matches your filter in this event folder.</p>
           </div>
         `;
         return;
       }
 
-      filteredPhotos.forEach((p, idx) => {
+      filteredItems.forEach((p, idx) => {
         const card = document.createElement('div');
         card.className = 'photo-card';
 
-        const thumbSrc = getFileUrl(p.thumb_file_id);
+        const isVideo = p.media_type === 'video';
+        const isLarge = (p.file_size || 0) > MAX_WORKER_DOWNLOAD_BYTES;
+        const thumbSrc = p.thumb_file_id ? getFileUrl(p.thumb_file_id) : '';
+
+        // Badges for video cards
+        let videoBadgesHtml = '';
+        if (isVideo) {
+          const durationStr = formatDuration(p.duration);
+          videoBadgesHtml = `
+            <div class="video-badges">
+              <span class="video-badge video-badge-pill">VIDEO</span>
+              ${durationStr ? `<span class="video-badge">${durationStr}</span>` : ''}
+              ${isLarge ? `<span class="video-badge video-badge-large">&gt;20MB</span>` : ''}
+              <span class="video-badge">${formatBytes(p.file_size)}</span>
+            </div>
+          `;
+        }
 
         card.innerHTML = `
-          <div class="photo-img-wrapper shimmer-skeleton">
-            <img class="photo-img" src="${thumbSrc}" alt="${escapeHtml(p.caption || p.file_name)}" loading="lazy" decoding="async" onload="this.style.opacity='1'; this.parentElement.classList.remove('shimmer-skeleton');">
+          <div class="card-media-wrapper shimmer-skeleton">
+            ${thumbSrc
+              ? `<img class="card-img" src="${thumbSrc}" alt="${escapeHtml(p.caption || p.file_name)}" loading="lazy" decoding="async" onload="this.style.opacity='1'; this.parentElement.classList.remove('shimmer-skeleton');">`
+              : `<div class="folder-cover-empty" style="background: radial-gradient(circle, #1a243b 0%, #0d121f 100%);">
+                   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                 </div>`
+            }
+            ${isVideo ? `
+              <div class="video-play-overlay">
+                <div class="video-play-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+                </div>
+              </div>
+              ${videoBadgesHtml}
+            ` : ''}
           </div>
           <div class="photo-overlay">
             ${p.caption ? `<div class="photo-overlay-caption">${escapeHtml(p.caption)}</div>` : ''}
@@ -1260,12 +1451,12 @@
           </div>
         `;
 
-        card.addEventListener('click', () => openLightbox(filteredPhotos, idx));
+        card.addEventListener('click', () => openLightbox(filteredItems, idx));
         photoContainer.appendChild(card);
       });
     }
 
-    // DOWNLOAD ALL AS .ZIP FEATURE
+    // DOWNLOAD ALL AS .ZIP
     async function downloadFolderAsZip() {
       if (isZipping || !activeFolderPhotos || activeFolderPhotos.length === 0) return;
       if (typeof JSZip === 'undefined') {
@@ -1276,32 +1467,42 @@
       isZipping = true;
       downloadZipBtn.disabled = true;
 
-      const zip = new JSZip();
-      const folderName = (currentFolderName || 'Family_Photos').replace(/[\\/:*?"<>|]/g, '_');
-      const total = activeFolderPhotos.length;
+      // Filter to files <= 20 MB that can be fetched via Telegram getFile API
+      const queue = activeFolderPhotos.filter(p => (p.file_size || 0) <= MAX_WORKER_DOWNLOAD_BYTES);
+      const total = queue.length;
       let completed = 0;
+
+      if (total === 0) {
+        alert('All videos in this folder are over 20 MB and must be opened directly in Telegram.');
+        downloadZipBtn.disabled = false;
+        isZipping = false;
+        return;
+      }
+
+      const zip = new JSZip();
+      const folderName = (currentFolderName || 'Family_Media').replace(/[\\/:*?"<>|]/g, '_');
 
       const updateProgress = (text) => {
         zipBtnText.textContent = text;
       };
 
       try {
-        // Parallel batch downloader (concurrency: 4)
         const concurrency = 4;
-        const queue = [...activeFolderPhotos];
+        const workQueue = [...queue];
 
         async function worker() {
-          while (queue.length > 0) {
-            const photo = queue.shift();
-            const downloadUrl = getFileUrl(photo.full_file_id);
+          while (workQueue.length > 0) {
+            const item = workQueue.shift();
+            const downloadUrl = getFileUrl(item.full_file_id);
             try {
               const res = await fetch(downloadUrl);
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
               const blob = await res.blob();
-              const fileName = photo.file_name || `photo_${photo.id || Date.now()}.jpg`;
+              const ext = item.media_type === 'video' ? 'mp4' : 'jpg';
+              const fileName = item.file_name || `media_${item.id || Date.now()}.${ext}`;
               zip.file(fileName, blob);
             } catch (err) {
-              console.error(`Failed to download ${photo.file_name}:`, err);
+              console.error(`Failed to download ${item.file_name}:`, err);
             } finally {
               completed++;
               updateProgress(`Downloading ${completed} / ${total}...`);
@@ -1331,24 +1532,24 @@
 
         updateProgress('✓ Download Complete!');
         setTimeout(() => {
-          const totalBytes = activeFolderPhotos.reduce((sum, p) => sum + (p.file_size || 0), 0);
-          zipBtnText.textContent = `⬇ Download All (${total} photos · ${formatBytes(totalBytes)})`;
+          const totalDownloadBytes = queue.reduce((sum, p) => sum + (p.file_size || 0), 0);
+          zipBtnText.textContent = `⬇ Download All ZIP (${total} items · ${formatBytes(totalDownloadBytes)})`;
           downloadZipBtn.disabled = false;
           isZipping = false;
         }, 3000);
       } catch (err) {
         console.error('Error generating zip:', err);
         alert('Failed to generate ZIP. Please try again.');
-        const totalBytes = activeFolderPhotos.reduce((sum, p) => sum + (p.file_size || 0), 0);
-        zipBtnText.textContent = `⬇ Download All (${total} photos · ${formatBytes(totalBytes)})`;
+        const totalDownloadBytes = queue.reduce((sum, p) => sum + (p.file_size || 0), 0);
+        zipBtnText.textContent = `⬇ Download All ZIP (${total} items · ${formatBytes(totalDownloadBytes)})`;
         downloadZipBtn.disabled = false;
         isZipping = false;
       }
     }
 
     // Open Lightbox
-    function openLightbox(photoList, index) {
-      activeFolderPhotos = photoList;
+    function openLightbox(itemList, index) {
+      activeFolderPhotos = itemList;
       activePhotoIndex = index;
       updateLightboxContent();
       lightbox.classList.add('active');
@@ -1357,6 +1558,11 @@
     }
 
     function closeLightbox() {
+      // Pause and clear video playback
+      if (lightboxVideo) {
+        lightboxVideo.pause();
+        lightboxVideo.src = '';
+      }
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
     }
@@ -1367,33 +1573,105 @@
 
       lightboxCounter.textContent = `${activePhotoIndex + 1} / ${activeFolderPhotos.length}`;
 
-      const fullSrc = getFileUrl(p.full_file_id);
-      lightboxImg.src = fullSrc;
-      lightboxCaption.textContent = p.caption || 'No caption';
+      // Reset previous playback
+      lightboxVideo.pause();
+      lightboxVideo.src = '';
+
+      const isVideo = p.media_type === 'video';
+      const isLarge = (p.file_size || 0) > MAX_WORKER_DOWNLOAD_BYTES;
+      const tgLink = getTelegramMessageLink(p);
+
+      // Media Player / Preview Display
+      if (isVideo) {
+        lightboxTypeBadge.textContent = isLarge ? 'HD Video (>20MB)' : 'Video (MP4)';
+
+        if (!isLarge) {
+          // Playable in-browser video (<= 20 MB)
+          lightboxImg.style.display = 'none';
+          lightboxLargeVideo.style.display = 'none';
+          lightboxVideo.style.display = 'block';
+          lightboxVideo.src = getFileUrl(p.full_file_id);
+          lightboxVideo.play().catch(() => {});
+        } else {
+          // Large video (> 20 MB) - Show notice & direct Telegram launch
+          lightboxImg.style.display = 'none';
+          lightboxVideo.style.display = 'none';
+          lightboxLargeVideo.style.display = 'flex';
+          largeVideoThumbImg.src = p.thumb_file_id ? getFileUrl(p.thumb_file_id) : '';
+          largeVideoSizeText.textContent = `File size: ${formatBytes(p.file_size)}${p.duration ? ` · Duration: ${formatDuration(p.duration)}` : ''}`;
+          largeVideoTelegramBtn.href = tgLink || '#';
+        }
+      } else {
+        // Standard Photo
+        lightboxTypeBadge.textContent = 'Photo';
+        lightboxVideo.style.display = 'none';
+        lightboxLargeVideo.style.display = 'none';
+        lightboxImg.style.display = 'block';
+        lightboxImg.src = getFileUrl(p.full_file_id);
+      }
+
+      // Metadata
+      lightboxCaption.textContent = p.caption || (isVideo ? (p.file_name || 'Video clip') : 'No caption');
       lightboxSender.textContent = `Uploaded by ${p.sender || 'Anonymous'}`;
       lightboxDate.textContent = formatDate(p.created_at);
       lightboxTopic.textContent = p.topic_name || 'General';
 
-      // Download Button
-      const downloadUrl = getFileUrl(p.full_file_id, true, p.file_name);
-      lightboxDownloadBtn.href = downloadUrl;
-      const sizeStr = p.file_size ? ` (${formatBytes(p.file_size)})` : '';
-      downloadBtnText.textContent = `Download Original Full-Res${sizeStr}`;
+      // Action Buttons
+      if (isVideo && isLarge) {
+        // Large Video: Main action is Telegram link
+        downloadBtnText.textContent = `Watch in Telegram (${formatBytes(p.file_size)})`;
+        lightboxDownloadBtn.href = tgLink || '#';
+        lightboxDownloadBtn.className = 'btn btn-telegram';
+        lightboxDownloadBtn.removeAttribute('download');
 
-      // Navigation button visibility
+        lightboxTgLinkBtn.style.display = 'none';
+      } else if (isVideo) {
+        // Playable Video
+        downloadBtnText.textContent = `⬇ Download Video (${formatBytes(p.file_size)})`;
+        lightboxDownloadBtn.href = getFileUrl(p.full_file_id, true, p.file_name || 'video.mp4');
+        lightboxDownloadBtn.className = 'btn btn-primary';
+        lightboxDownloadBtn.setAttribute('download', p.file_name || 'video.mp4');
+
+        if (tgLink) {
+          lightboxTgLinkBtn.href = tgLink;
+          lightboxTgLinkBtn.style.display = 'inline-flex';
+        } else {
+          lightboxTgLinkBtn.style.display = 'none';
+        }
+      } else {
+        // Photo
+        downloadBtnText.textContent = `Download Original (${formatBytes(p.file_size)})`;
+        lightboxDownloadBtn.href = getFileUrl(p.full_file_id, true, p.file_name || 'photo.jpg');
+        lightboxDownloadBtn.className = 'btn btn-primary';
+        lightboxDownloadBtn.setAttribute('download', p.file_name || 'photo.jpg');
+
+        if (tgLink) {
+          lightboxTgLinkBtn.href = tgLink;
+          lightboxTgLinkBtn.style.display = 'inline-flex';
+        } else {
+          lightboxTgLinkBtn.style.display = 'none';
+        }
+      }
+
+      // Nav visibility
       lightboxPrev.style.display = activePhotoIndex > 0 ? 'flex' : 'none';
       lightboxNext.style.display = activePhotoIndex < activeFolderPhotos.length - 1 ? 'flex' : 'none';
 
       preloadSurroundingImages();
     }
 
-    // Preload next and previous full-res photos for instant swipe/arrowing
+    // Preload surrounding media thumbnails/photos
     function preloadSurroundingImages() {
       [-1, 1, 2].forEach(offset => {
         const target = activeFolderPhotos[activePhotoIndex + offset];
-        if (target && target.full_file_id) {
-          const img = new Image();
-          img.src = getFileUrl(target.full_file_id);
+        if (target) {
+          const targetUrl = target.media_type === 'video'
+            ? (target.thumb_file_id ? getFileUrl(target.thumb_file_id) : '')
+            : getFileUrl(target.full_file_id);
+          if (targetUrl) {
+            const img = new Image();
+            img.src = targetUrl;
+          }
         }
       });
     }
